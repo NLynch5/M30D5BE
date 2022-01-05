@@ -22,7 +22,7 @@ exports.hashPassword = async (req, res, next) => {
     req.body.pass = await bcrypt.hash(req.body.pass, 8);
     next();
   } catch (error) {
-    console.loe(error);
+    console.log(error);
   }
 };
 
