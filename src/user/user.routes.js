@@ -15,6 +15,6 @@ userRouter.get("/user", listUser); //CRUD READ
 userRouter.put("/user", hashPassword, passwordMatch, updateUser); //CRUD UPDATE
 userRouter.delete("/user", deleteUser); //CRUD DELETE
 
-userRouter.post("/user", loginUser);
+userRouter.post("/login", loginUser);
 
 module.exports = userRouter;
