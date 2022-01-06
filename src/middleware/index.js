@@ -1,40 +1,26 @@
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const User = require("../user/user.model");
-
-exports.tokenDecoding = async (req, res, next) => {
-  try {
-    const token = req.header("Authorization").replace("Bearer", "");
-    const decodedToken = await jwt.verify(token, process.env.SECRET);
-    req.user = await User.findById(decodedToken._id);
-    if (req.user) {
-      next();
-    } else {
-      throw new Error();
-    }
-  } catch (error) {
-    console.log(error);
-  }
-};
 
 exports.hashPassword = async (req, res, next) => {
   try {
-    req.body.pass = await bcrypt.hash(req.body.pass, 8);
-    next();
+    req.body.password = await bcrypt.hash(req.body.password, 8);
+    await next();
   } catch (error) {
     console.log(error);
+    res.status(500).send({ message: "Unsuccessful, please try again" });
   }
 };
 
-exports.decryptPassword = async (req, res, next) => {
+exports.passwordMatch = async (req, res) => {
   try {
-    req.user = await User.findOne({ username: req.body.username });
-    if (await bcrypt.compare(req.body.pass, req.user.pass)) {
-      next();
+    const userPassword = await req.body.password;
+    const match = await bcrypt.compare(userPassword, req.body.password);
+    if (match) {
+      res.status(201).send({ message: "Bingo!" });
     } else {
-      throw new Error();
+      res.status(202).send("Password does not a match");
     }
   } catch (error) {
-    console.log(error);
+    res.status(501).send({ message: "Unsuccessful" });
   }
 };
