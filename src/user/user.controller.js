@@ -1,5 +1,5 @@
 //import { useState } from "react";
-
+const bcrypt = require("bcryptjs");
 const User = require("./user.model");
 
 //CREATE (POST)
@@ -46,14 +46,21 @@ exports.deleteUser = async (req, res) => {
 };
 
 //login function
-exports.loginUser = async (req, res) => {
+exports.loginUser = async (req, res, next) => {
   try {
-    loginUser = await User.findOne(req.user.email);
-    res.status(200).send({ message: "User Found", loginUser });
+    const loginUser = await User.findOne({ email: req.body.email });
+    if (await bcrypt.compare(req.body.password, loginUser.password)) {
+      req.user = loginUser;
+      next();
+      res.status(200).send({ message: "succesfully logged in", });
+    } else {
+      console.log("error decrypt")
+    }
+
   } catch (error) {
     console.log(error);
+    res.status(500).send({ message: "incorrect Email or Password  Try Again!" });
   }
 };
-
 //check connection in terminal using node src/server.js - once connection is succeessfully established then
 //test using GET/POST etc in Insomnia before checking the database has changed correctly in MongoDB/Mongoose
