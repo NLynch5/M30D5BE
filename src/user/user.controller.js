@@ -1,5 +1,6 @@
 //import { useState } from "react";
 const bcrypt = require("bcryptjs");
+const { rawListeners } = require("./user.model");
 const User = require("./user.model");
 
 //CREATE (POST)
@@ -46,13 +47,12 @@ exports.deleteUser = async (req, res) => {
 };
 
 //login function
-exports.loginUser = async (req, res, next) => {
+exports.loginUser = async (req, res,) => {
   try {
     const loginUser = await User.findOne({ email: req.body.email });
     if (await bcrypt.compare(req.body.password, loginUser.password)) {
       req.user = loginUser;
-      next();
-      res.status(200).send({ message: "succesfully logged in", });
+      res.status(200).send({ message: "succesfully logged in", user: req.user });
     } else {
       console.log("error decrypt")
     }
